@@ -27,7 +27,7 @@ SerialPort::SerialPort(char *portName)
 			printf("failed to get current serial parameters");
 		}
 		else {
-			dcbSerialParameters.BaudRate = CBR_9600;
+			dcbSerialParameters.BaudRate = CBR_115200;
 			dcbSerialParameters.ByteSize = 8;
 			dcbSerialParameters.StopBits = ONESTOPBIT;
 			dcbSerialParameters.Parity = NOPARITY;
