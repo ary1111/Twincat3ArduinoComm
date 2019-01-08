@@ -1,3 +1,15 @@
+/* RS485 AMT21 Communication
+ * v 2.0, stable, 1/8/2019
+ * Description: This script is for communicating with an encoder over RS485 (AMT 213A-V by CUI Inc. is used in this example)
+ *              Once uploaded, the output from Serial1 can be read by C++ through Serial using the C++ library. 
+ *              For debugging,
+ *                1) Upload to Arduino Mega
+ *                2) Open Serial Monitor (CTRL+Shift+M)
+ *                3) Set baud rate to 115200
+ *                4) Enter 'T' (or the respective command char)
+ *                5) The encoder reading should be output
+ */
+
 #define RX        19  //For Arduino Mega
 #define TX        18
 
@@ -17,17 +29,11 @@ int byteOut;
 
 uint16_t currentPOS = 0xFFFF;
 bool binaryArray[16];
-//bool readvar = true;
 
 void setup()   /****** SETUP: RUNS ONCE ******/
 {
-  //Serial.begin(9600);
-  Serial.begin(115200);
-  /*while (!Serial) {
-    ; // wait for serial port to connect. Needed for native USB port only
-  }
-  Serial.println("Serial ready for transmitting");
-  */ 
+  Serial.begin(115200);           // Set the data rate to be recognized by the C++ script
+  
   pinMode(Pin13LED, OUTPUT);   
   pinMode(Re, OUTPUT);
   pinMode(De, OUTPUT);    
@@ -35,7 +41,7 @@ void setup()   /****** SETUP: RUNS ONCE ******/
   //digitalWrite(RxTx, Receive);  //Initialize transciever to receive data
   RS485Receive();  
 
-  Serial1.begin(2000000);         // Set the data rate 
+  Serial1.begin(2000000);         // Set the data rate for the encoder
 
 }//--(end setup )---
 
@@ -45,12 +51,9 @@ void loop()   /****** LOOP: RUNS CONSTANTLY ******/
   digitalWrite(Pin13LED, HIGH);       //On when not transmitting
   if (Serial.available())
   {
-    //Serial.println();
-    //Serial.println("Sent");           //Serial indicator
     byteOut = Serial.read();          //Locally store the transmitted string
     
     RS485Transmit(); 
-    //Serial1.write("T");
     Serial1.write(byteOut);           // Send byte to encoder
     
     digitalWrite(Pin13LED, LOW);      // Off momentarily 
@@ -58,17 +61,21 @@ void loop()   /****** LOOP: RUNS CONSTANTLY ******/
     RS485Receive();
     delay(10);  
   }
-  //delay(10);
+
   if (Serial1.available())                //Look for data from encoder
-   {   
+   {
+    /*Debugging functions*/   
     //Serial.println(Serial1.available());
     //Serial.println("Received");
+    
     digitalWrite(Pin13LED, LOW);          // Off momentarily
     byteIn = Serial1.read();              // Read received byte. Not sure what this signifies
-    //Serial.println(byteIn);
     byteLow = Serial1.read();             // Read received byte. Low Byte
-    //Serial.println(byteLow);
     byteHigh = Serial1.read();            // Read received byte. High Byte
+
+    /*Debugging functions*/
+    //Serial.println(byteIn);
+    //Serial.println(byteLow);
     //Serial.println(byteHigh);
 
     currentPOS = byteLow + (byteHigh << 8);
@@ -88,10 +95,8 @@ void loop()   /****** LOOP: RUNS CONSTANTLY ******/
     }
           
     Serial.print(currentPOS);
-    //Serial.print(0x0020); 
     delay(10);   
-   }
-     
+   }     
 }
 
 void RS485Transmit()
