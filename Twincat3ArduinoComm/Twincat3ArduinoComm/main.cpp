@@ -47,7 +47,7 @@ double getTime();
 void		InitADS();
 void		WriteADS();
 
-int frequency = 50;											//Hz
+int frequency = 100;											//Hz
 double period = 1000 / (double)frequency;		//ms
 double currentTime = 0.0;
 double startTime = 0.0;
@@ -62,6 +62,7 @@ std::string str;
 int data[2]; int i = 0;
 
 //int prevdata;
+int prevInt= 1800;												//Calibration position
 //String for incoming data
 char incomingData[MAX_DATA_LENGTH_IN];
 char prevData[MAX_DATA_LENGTH_IN];
@@ -76,8 +77,9 @@ int main()
 	SerialPort arduino(port_name);
 	if (arduino.isConnected()) std::cout << "Connection Established" << std::endl;
 	else std::cout << "ERROR, check port name";
+
 	//We collect a value to throw away
-	arduino.writeSerialPort(myChar, MAX_DATA_LENGTH_OUT);
+	/*arduino.writeSerialPort(myChar, MAX_DATA_LENGTH_OUT);
 	int read_result = arduino.readSerialPort(incomingData, MAX_DATA_LENGTH_IN);
 
 	for (val = strtok_s(incomingData, delimiter, &val2); val != NULL; val = strtok_s(NULL, delimiter, &val2)) {
@@ -85,11 +87,12 @@ int main()
 	}
 	i = 0;
 	Sleep(1000);
+	*/
 
 	//We then collect the first value for prevdata
 	currentTime = (getTime() - startTime);
 	arduino.writeSerialPort(myChar, MAX_DATA_LENGTH_OUT);
-	read_result = arduino.readSerialPort(incomingData, MAX_DATA_LENGTH_IN);
+	int read_result = arduino.readSerialPort(incomingData, MAX_DATA_LENGTH_IN);
 
 	for (int i = 0; i < sizeof(prevData); i++)
 	{
@@ -115,12 +118,14 @@ int main()
 			arduino.writeSerialPort(myChar, MAX_DATA_LENGTH_OUT);
 			read_result = arduino.readSerialPort(incomingData, MAX_DATA_LENGTH_IN);
 
-			/*for (val = strtok_s(incomingData, delimiter, &val2); val != NULL; val = strtok_s(NULL, delimiter, &val2)) {
-				data[i] = (int)atof(val); 
+			//std::cout << (int)atof(incomingData) << ',' << sizeof(incomingData) << std::endl;
+			for (val = strtok_s(incomingData, delimiter, &val2); val != NULL; val = strtok_s(NULL, delimiter, &val2)) {
+				data[i] = (int)atof(val);
 				i++;
 			}
 			i = 0;
-			
+
+			/*
 			if (std::abs(prevdata - data[0]) > 20)
 				nData.EncoderValue = prevdata;
 			else
@@ -128,7 +133,10 @@ int main()
 				nData.EncoderValue = data[0];
 				prevdata = data[0];
 			}*/
-			if ((int)atof(incomingData) > 10000 || abs((int)atof(incomingData)- (int)atof(prevData))>500)
+
+			//Uncomment, debugging january BEGIN
+			//if ((int)atof(incomingData) > 10000 || abs((int)atof(incomingData)- (int)atof(prevData))>500)
+			if ((int)atof(incomingData) > 10000)
 			{
 				std::cout << "ERROR: Bad Data Transfer, value: " << (int)atof(incomingData) << std::endl;				
 				for (int i = 0; i < sizeof(prevData); i++)
@@ -144,29 +152,44 @@ int main()
 				//arduino.writeSerialPort(myChar, MAX_DATA_LENGTH_OUT);
 				//read_result = arduino.readSerialPort(incomingData, MAX_DATA_LENGTH_IN);
 
-				/*nData.EncoderValue = (int)atof(incomingData);
+				nData.EncoderValue = (int)atof(incomingData);
 				//prevdata = (int)atof(incomingData);
 				for (int i = 0; i < sizeof(prevData); i++)
 				{
 					prevData[i] = incomingData[i];
 				}
 
-				std::cout << incomingData << std::endl;*/
+				std::cout << incomingData << std::endl;
+			
+				
+			}
+			//UNCOMMENT END, DEBUG JANUARY
+			if ((int)atof(incomingData)< 5000 && abs((int)atof(incomingData) - prevInt)<500)
+			{
+				prevInt	= (int)atof(incomingData);
+				nData.EncoderValue = (int)atof(incomingData);
+			}
+
+			else
+			{
+				nData.EncoderValue = prevInt;
 			}
 			//else
 			//{
-				nData.EncoderValue = (int)atof(incomingData);
+				//nData.EncoderValue = (int)atof(incomingData);
 				//prevdata = (int)atof(incomingData);
-				for (int i = 0; i < sizeof(prevData); i++)
+				/*for (int i = 0; i < sizeof(prevData); i++)
 				{
 					prevData[i]=incomingData[i];
-				}
+				}*/
 			//}
+
 			/*Prints out data, uncomment to debug*/	
 			//std::cout << incomingData << std::endl;
 			//std::cout << read_result << ',' << data[0] << ',' << data[1] << ',' << sizeof(incomingData) << std::endl;
 			//std::cout << data[0] << std::endl;
-			//std::cout << nData.EncoderValue << std::endl;
+			std::cout << nData.EncoderValue << std::endl;
+			//std::cout << std::endl;
 			
 			/*Writes the value to the ADS comm*/
 			WriteADS();

@@ -2,7 +2,7 @@
 #define SERIALPORT_H
 
 #define ARDUINO_WAIT_TIME 2000
-#define MAX_DATA_LENGTH_IN 11
+#define MAX_DATA_LENGTH_IN 4 //To Do: Debug the overloaded stream to allow for 11
 #define MAX_DATA_LENGTH_OUT 2
 
 #include <windows.h>

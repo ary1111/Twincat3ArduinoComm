@@ -17,10 +17,12 @@ int byteOut;
 
 uint16_t currentPOS = 0xFFFF;
 bool binaryArray[16];
+//bool readvar = true;
 
 void setup()   /****** SETUP: RUNS ONCE ******/
 {
-  Serial.begin(9600);
+  //Serial.begin(9600);
+  Serial.begin(115200);
   /*while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
   }
@@ -48,16 +50,17 @@ void loop()   /****** LOOP: RUNS CONSTANTLY ******/
     byteOut = Serial.read();          //Locally store the transmitted string
     
     RS485Transmit(); 
+    //Serial1.write("T");
     Serial1.write(byteOut);           // Send byte to encoder
     
     digitalWrite(Pin13LED, LOW);      // Off momentarily 
     delay(10);
     RS485Receive();
-    delay(250);    
+    delay(10);  
   }
-  
+  //delay(10);
   if (Serial1.available())                //Look for data from encoder
-   {
+   {   
     //Serial.println(Serial1.available());
     //Serial.println("Received");
     digitalWrite(Pin13LED, LOW);          // Off momentarily
@@ -84,9 +87,11 @@ void loop()   /****** LOOP: RUNS CONSTANTLY ******/
       currentPOS = 0xFFFF; //Bad Pos
     }
           
-    Serial.print(currentPOS); 
-    delay(10);
-   }  
+    Serial.print(currentPOS);
+    //Serial.print(0x0020); 
+    delay(10);   
+   }
+     
 }
 
 void RS485Transmit()
