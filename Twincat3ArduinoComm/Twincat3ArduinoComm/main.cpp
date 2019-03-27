@@ -4,16 +4,16 @@
 		Adam Ryason
 		Melih Turkseven		
 
-\version    1.0
-\date        06/2018
+\version    1.1
+\date        01/2019
 \bug	        None yet
 \read		Arduino Serial Port
 \write		TwinCat3 ADS
 \brief	    This project reads from the serial port of an Arduino and transmits the data
 				over ADS (Automation Device Specification) to be read by a TwinCat3 Real-Time System
 
-				This example reads the value of a digital, incremental encoder through an Arduino with a
-				Robogaia Encoder Plate Shield to be used as a reference within an automation system (TC3)
+				This example reads the value of an absolute encoder through RS485 connected to Arduino
+				to be used as a reference within an automation system (TC3)
 \features
 				- Single axis (can be expanded up to 3)
 
@@ -62,7 +62,7 @@ std::string str;
 int data[2]; int i = 0;
 
 //int prevdata;
-int prevInt= 1800;												//Calibration position
+int prevInt= 3824;												//Calibration position
 //String for incoming data
 char incomingData[MAX_DATA_LENGTH_IN];
 char prevData[MAX_DATA_LENGTH_IN];
@@ -164,7 +164,7 @@ int main()
 				
 			}
 			//UNCOMMENT END, DEBUG JANUARY
-			if ((int)atof(incomingData)< 5000 && abs((int)atof(incomingData) - prevInt)<500)
+			if ((int)atof(incomingData)< 8000 && abs((int)atof(incomingData) - prevInt)<400)
 			{
 				prevInt	= (int)atof(incomingData);
 				nData.EncoderValue = (int)atof(incomingData);
@@ -188,7 +188,7 @@ int main()
 			//std::cout << incomingData << std::endl;
 			//std::cout << read_result << ',' << data[0] << ',' << data[1] << ',' << sizeof(incomingData) << std::endl;
 			//std::cout << data[0] << std::endl;
-			std::cout << nData.EncoderValue << std::endl;
+			//std::cout << nData.EncoderValue << std::endl;
 			//std::cout << std::endl;
 			
 			/*Writes the value to the ADS comm*/
