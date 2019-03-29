@@ -327,3 +327,5 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder
 .mfractor/
+TwinCAT3Logger/TwinCAT3Logger/TwinCAT3Logger.vcxproj.filters
+*.csv
